@@ -20,34 +20,60 @@ def _constant_polynome(polynome: Sequence[float]) -> str:
     return f"{polynome[0]}"
 
 
-def _lineal_polynome(polynom: Sequence[float]) -> str:
+def _get_start_coefficient(c: float) -> str:
+    if c == 1:
+        return ""
+    elif c == -1:
+        return "-"
+    else:
+        return f"{c}"
+
+
+def _get_free_coefficient(c: float) -> str:
+    if c > 0:
+        return f"+ {c}"
+    else:
+        return f"- {-c}"
+
+
+def _lineal_polynome(polynom: Sequence[float], var_name: str) -> str:
     c = polynom[1]
-    first_term = f"{-c}" if c < 0 else f" + {c}"
-    return f"{polynom[0]} {first_term}"
+    first_term = _get_start_coefficient(c)
+    term = f"{first_term}{var_name}"
+    c = polynom[0]
+    if c != 0:
+        last_term = _get_free_coefficient(c)
+        term = f"{term} {last_term}"
+    return term
+
+
+def _get_middle_coefficient(c: float) -> str:
+    if c == 1:
+        return "+ "
+    if c == -1:
+        return "- "
+    return f"- {-c}" if c < 0 else f"+ {c}"
 
 
 def to_string(polynomial: Sequence[float], var_name:str = "x") -> str:
     if len(polynomial) == 1:
-        return _constant_polynome(polynomial, var_name)
+        return _constant_polynome(polynomial)
     if len(polynomial) == 2:
         return _lineal_polynome(polynomial, var_name)
     else:
-        start = 0
-        while polynomial[start] == 0:  # strip zero coefficients
-            start += 1
-        if start == 0:  # p[0] is significant p[1] may be 0, 1, or else
-            term = "p[0] + p[1]x" # todo
-        elif start == 1:
-            term = "p[1]x"
-        else:
-            term = "p[2]x^2"
-        start = start+1
-        for exp, coefficient in enumerate(polynomial[start:], start=start):
-            if coefficient != 0: # only eliminate term with exact 0 coefficient
-                c = f"- {-coefficient}" if coefficient < 0 else f"+ {coefficient}"
-                var = ""
-                if exp > 0:
-                    var = f"{var_name}^{exp}" if exp > 1 else f"{var_name}"
-                term = f"{term} {c}{var}"
+        p_degree = len(polynomial) - 1
+        first_term = _get_start_coefficient(polynomial[-1])
+        term = f"{first_term}{var_name}^{p_degree}"
+        for idx, coe in enumerate(polynomial[-2:1:-1], start=1):
+            if coe != 0:
+                mid_term = _get_middle_coefficient(coe)
+                exp = p_degree - idx
+                term = f"{term} {mid_term}{var_name}^{exp}"
+        if polynomial[1] != 0:
+            mid_term = _get_middle_coefficient(polynomial[1])
+            term = f"{term} {mid_term}{var_name}"
+        if polynomial[0] != 0:
+            last_term = _get_free_coefficient(polynomial[0])
+            term = f"{term} {last_term}"
         return term
 
