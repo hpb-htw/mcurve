@@ -54,26 +54,3 @@ def _get_middle_coefficient(c: float) -> str:
         return "- "
     return f"- {-c}" if c < 0 else f"+ {c}"
 
-
-def to_string(polynomial: Sequence[float], var_name:str = "x") -> str:
-    if len(polynomial) == 1:
-        return _constant_polynome(polynomial)
-    if len(polynomial) == 2:
-        return _lineal_polynome(polynomial, var_name)
-    else:
-        p_degree = len(polynomial) - 1
-        first_term = _get_start_coefficient(polynomial[-1])
-        term = f"{first_term}{var_name}^{p_degree}"
-        for idx, coe in enumerate(polynomial[-2:1:-1], start=1):
-            if coe != 0:
-                mid_term = _get_middle_coefficient(coe)
-                exp = p_degree - idx
-                term = f"{term} {mid_term}{var_name}^{exp}"
-        if polynomial[1] != 0:
-            mid_term = _get_middle_coefficient(polynomial[1])
-            term = f"{term} {mid_term}{var_name}"
-        if polynomial[0] != 0:
-            last_term = _get_free_coefficient(polynomial[0])
-            term = f"{term} {last_term}"
-        return term
-
